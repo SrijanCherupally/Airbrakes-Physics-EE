@@ -23,6 +23,10 @@ float batteryVoltage = 0.0f;
 uint32_t axisError = 0;
 
 static uint32_t lastFeedbackMs = 0;
+static uint32_t eeLastPairMs = 0;
+static uint32_t eePairSequence = 0;
+bool eeTelemetryFresh() { return eePairSequence && (uint32_t)(millis()-eeLastPairMs) < 200; }
+uint32_t eeTelemetrySequence() { return eePairSequence; }
 static uint32_t lastHeartbeatMs = 0;
 static uint32_t lastEnableRequestMs = 0;
 static uint32_t lastPositionDiagnosticMs = 0;
@@ -211,7 +215,11 @@ void setupHardware() {
   odrv.clearErrors();
   odrv.setControllerMode(ODriveControlMode::CONTROL_MODE_POSITION_CONTROL,
                          ODriveInputMode::INPUT_MODE_PASSTHROUGH);
+  #ifdef EE_BENCH
+  odrv.setState(ODriveAxisState::AXIS_STATE_IDLE);
+#else
   odrv.setState(ODriveAxisState::AXIS_STATE_CLOSED_LOOP_CONTROL);
+#endif
 }
 
 void updateBatteryVoltage() {
@@ -286,6 +294,7 @@ void serviceOdrive() {
     bool currentsReceived = odrv.getCurrents(currents, 5);
     if (currentsReceived) {
       motorcurrent = currents.Iq_Measured;
+      if (feedbackReceived) { eeLastPairMs=millis(); ++eePairSequence; }
     } else {
       ++odriveTelemetryTimeouts;
     }
@@ -314,6 +323,7 @@ void serviceOdrive() {
   bool feedbackFresh = lastFeedbackMs != 0 &&
                        (uint32_t)(nowMs - lastFeedbackMs) <=
                            ODRIVE_FEEDBACK_TIMEOUT_MS;
+  #ifndef EE_BENCH
   if (odriveHeartbeatFresh() &&
       (!feedbackFresh || lastHeartbeat.Axis_State !=
                               ODriveAxisState::AXIS_STATE_CLOSED_LOOP_CONTROL) &&
@@ -322,6 +332,7 @@ void serviceOdrive() {
     odrv.clearErrors();
     odrv.setState(ODriveAxisState::AXIS_STATE_CLOSED_LOOP_CONTROL);
   }
+#endif
 }
 
 void odrvPosition(float pos) {

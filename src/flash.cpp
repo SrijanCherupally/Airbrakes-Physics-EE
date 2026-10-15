@@ -4,6 +4,7 @@
 
 #include "orientation.h"
 #include "state.h"
+#include "ee_bench.h"
 
 // Binary data structure (76 bytes per record).
 // Keep this layout synchronized with desktop/main.js (<I16fII).
@@ -372,12 +373,18 @@ void handleFlashCommands() {
         Serial.println("BATTERY_MONITOR:OFF");
       } else if (commandBuffer == "BARO STATUS") {
         baro.printDiagnostics();
+      } else if (eeBenchCommand(commandBuffer)) {
+        // EE commands own bench motion in the EE build.
       } else if (commandBuffer == "GROUND_TEST START") {
+#ifdef EE_BENCH
+        Serial.println("GROUND_TEST:ERROR:USE_EE_RUN");
+#else
         if (startGroundTest()) {
           Serial.println("GROUND_TEST:ARMED: Shake the rocket to start recording");
         } else {
           Serial.println("GROUND_TEST:ERROR: ODrive heartbeat/error/state not ready");
         }
+      #endif
       } else if (commandBuffer == "GROUND_TEST ABORT") {
         abortGroundTest();
         Serial.println("GROUND_TEST:ABORTED");

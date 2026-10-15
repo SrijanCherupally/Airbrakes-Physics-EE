@@ -1,5 +1,11 @@
 # Airbrakes V3
 
+## Physics EE experiment adaptation
+
+This derived repository adds a bench experiment for **added airbrake load vs motor current and RPM**, based on the original V3 electronics and CAN drivers.
+
+Start with [PHYSICS_EE.md](PHYSICS_EE.md). Launch the experiment app with `python ee/experiment.py gui` or `ee/launch.bat`. Use the **PhysicsEE** PlatformIO environment for physical trials. Results, metadata and analysis are stored together under `ee_results/`. The original V3 ground station remains available through `npm start`.
+
 Airbrakes V3 is a research and development project containing embedded firmware, a desktop ground-station application, simulation utilities, and flight-data tooling for an active-airbrakes test platform.
 
 The repository is organized so that firmware, desktop software, simulation, and recorded data can be developed and analyzed independently.

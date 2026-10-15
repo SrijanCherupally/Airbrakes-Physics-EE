@@ -2,6 +2,7 @@
 
 #include "state.h"
 #include "flash.h"
+#include "ee_bench.h"
 
 // Make setup blocking so core1 waits for hardware init.
 semaphore_t setup_done;
@@ -35,7 +36,11 @@ void loop() {
   serviceFlightLog();
 
   // Update state machine
+#ifdef EE_BENCH
+  eeBenchUpdate();
+#else
   stateUpdate();
+#endif
 }
 
 void setup1() {
@@ -45,5 +50,9 @@ void setup1() {
 
 void loop1() {
   // Update filter
+#ifdef EE_BENCH
+  delay(2);
+#else
   estimatorUpdate();
+#endif
 }

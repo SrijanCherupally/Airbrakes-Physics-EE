@@ -47,6 +47,7 @@ extern float motorcurrent;
 extern float motor_cmd_pos;
 extern float batteryVoltage;
 extern uint32_t axisError;
+extern Heartbeat_msg_t lastHeartbeat;
 
 void setupHardware();
 void updateBatteryVoltage();

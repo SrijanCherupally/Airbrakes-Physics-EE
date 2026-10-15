@@ -20,3 +20,6 @@ dist/
 out/
 coverage/
 # Flight logs are intentionally versioned in this repository.
+
+# EE raw results stay local; avoid publishing experimental data accidentally.
+ee_results/
